@@ -873,8 +873,8 @@ footer .fnote{font-size:12px;color:var(--ink-soft);line-height:1.9;}
       <p class="field-hint">上のテキストが自動でコピーされない場合は、この欄を長押し(またはクリック)して手動で全選択・コピーしてください。</p>
     </div>
 
-    <button type="button" class="submit-btn" id="copyBtn">この内容をコピーする</button>
-    <a class="order-btn line-cta-inline" href="https://lin.ee/nHrYBjT" target="_blank" rel="noopener noreferrer">公式LINEを開いて貼り付ける</a>
+    <button type="button" class="order-btn line-cta-inline" id="lineOrderBtn">LINEで注文する</button>
+    <p class="field-hint">LINEが開いたら、メッセージ欄を長押し → 貼り付け → 送信するだけです。</p>
     <div class="form-msg" id="formMsg"></div>
 
     <p class="privacy-note">
@@ -946,7 +946,7 @@ footer .fnote{font-size:12px;color:var(--ink-soft);line-height:1.9;}
   var addSelect = document.getElementById('addProductSelect');
   var orderNote = document.getElementById('orderNote');
   var orderTextArea = document.getElementById('orderText');
-  var copyBtn = document.getElementById('copyBtn');
+  var lineOrderBtn = document.getElementById('lineOrderBtn');
   var formMsg = document.getElementById('formMsg');
 
   window.openOrderForm = function(productLabel){
@@ -1038,11 +1038,12 @@ footer .fnote{font-size:12px;color:var(--ink-soft);line-height:1.9;}
   orderNote.addEventListener('input', updateOrderText);
 
   /* ---------- コピー(送信・保存は一切行わない。クリップボードへコピーするのみ) ---------- */
+  var LINE_URL = 'https://lin.ee/nHrYBjT';
   function showCopyMsg(text, isError){
     formMsg.className = 'form-msg ' + (isError ? 'error' : 'success');
     formMsg.textContent = text;
   }
-  copyBtn.addEventListener('click', function(){
+  lineOrderBtn.addEventListener('click', function(){
     updateOrderText();
     var text = orderTextArea.value;
     function fallbackCopy(){
@@ -1050,19 +1051,20 @@ footer .fnote{font-size:12px;color:var(--ink-soft);line-height:1.9;}
       orderTextArea.select();
       try{
         var ok = document.execCommand('copy');
-        if(ok){ showCopyMsg('コピーしました。下の「公式LINEを開いて貼り付ける」から貼り付けてください。', false); }
-        else { showCopyMsg('自動コピーに失敗しました。上の欄を長押しして手動でコピーしてください。', true); }
+        if(ok){ showCopyMsg('注文内容をコピーしました。', false); }
+        else { showCopyMsg('自動コピーできませんでした。下の注文内容を長押ししてコピーしてください。', true); }
       } catch(e){
-        showCopyMsg('自動コピーに失敗しました。上の欄を長押しして手動でコピーしてください。', true);
+        showCopyMsg('自動コピーできませんでした。下の注文内容を長押ししてコピーしてください。', true);
       }
     }
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(function(){
-        showCopyMsg('コピーしました。下の「公式LINEを開いて貼り付ける」から貼り付けてください。', false);
+        showCopyMsg('注文内容をコピーしました。', false);
       }).catch(fallbackCopy);
     } else {
       fallbackCopy();
     }
+    window.open(LINE_URL, '_blank', 'noopener,noreferrer');
   });
 
   renderCart();
